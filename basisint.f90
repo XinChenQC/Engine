@@ -94,7 +94,7 @@ INCLUDE 'parameter.h'
     atm =0
     bas =0
     env =0
-    offpoint = 1  ! start offpoint set to 1
+    offpoint = 10  ! start offpoint set to 1
     ! 2.1 Prepare Atm data.
     do i = 1,nAtoms
        atm(1,i) = atoms(i)%charge

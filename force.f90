@@ -7,7 +7,7 @@ use MOL_info
 use GRID_info
     implicit none
 INCLUDE 'parameter.h'
-    integer    :: i,j,k,l,info
+    integer    :: i,j,k,l,info,i2,j2
     integer    :: igrd
     
     integer :: shls1e(2),shls2e(4)
@@ -18,7 +18,8 @@ INCLUDE 'parameter.h'
     
     real(8),allocatable :: dS(:,:,:),dHcore(:,:,:),dJi(:,:,:),dKi(:,:,:)
     real(8),allocatable :: Vxca(:,:,:),Xxc(:,:,:,:),Vxcb(:,:,:)
-    real(8),allocatable :: Phixca(:,:,:),Phixcb(:,:,:)
+    real(8),allocatable :: Phixca(:,:,:),Phixcb(:,:,:),Dr(:,:,:)
+    real(8)   :: Drforce(3)
     real(8),allocatable :: W(:,:)
     type(Grid)          :: tmpGrid
     real(8)             :: NucVec(3),NucForce(3)
@@ -52,6 +53,9 @@ do i = 0,nBases-1
    enddo
 enddo
 
+print *,"Hcore"
+print *,dHcore(:,:,3)
+
 ! 2. D(ij|kl)
 allocate( dJi (nConts,nConts,3) ) 
 allocate( dKi (nConts,nConts,3))
@@ -78,7 +82,8 @@ enddo
 enddo
 enddo
 
-print *,dJi
+print *,"dJi"
+ print *,dJi(:,:,3)
 
 ! 3.  W
 
@@ -146,10 +151,11 @@ do igrd = 1,ngrids
    deallocate(Xxc)
 enddo
 
-print *,Vxca
-print *,Vxcb
 ! calculate force
 l = 0
+
+allocate( Dr(nConts,nConts,3) )
+
 do i = 1,natoms
    atoms(i)%atmForce = 0
    do j = 1,atoms(i)%nconts
@@ -173,9 +179,36 @@ do i = 1,natoms
                     Nucforce
       endif
    enddo
-   print *,Nucforce
+
+   env(5) = atoms(i)%coor(1)* ans2bohr
+   env(6) = atoms(i)%coor(2)* ans2bohr
+   env(7) = atoms(i)%coor(3)* ans2bohr
+
+
+   do i2 = 0,nBases-1
+     do j2 = 0,nBases-1
+      shls1e(1)=i2
+      shls1e(2)=j2
+      di = CINTcgto_cart(i2, bas)
+      dj = CINTcgto_cart(j2, bas)
+      allocate (buf1e(di,dj,3))
+! 1.1 Computing Overlap matrix
+      call cint1e_iprinv_cart(buf1e, shls1e , atm, nAtoms,bas,nBases,env,0_8)
+      call store1edrv(shls1e,di,dj,bas,nBases,buf1e,NorVEC,nConts,Dr)
+      deallocate(buf1e)
+     enddo
+   enddo
+   
+   Drforce = 0
+   do i2 = 1,nconts
+      do j2= 1,nconts
+         Drforce = Dr(i2,j2,:)*(Pa(i2,j2) + Pb(i2,j2)) + Drforce
+      enddo
+   enddo
+
+!   print *,Nucforce
    atoms(i)%atmForce=   atoms(i)%atmForce +Nucforce
-   print *,atoms(i)%atmForce   
+   print *,atoms(i)%atmForce-2*Drforce*atoms(i)%charge 
 enddo
 
 
@@ -354,11 +387,11 @@ do i = 1,nconts
       do k =0,2
          do l = 0,2
              if (l .ge. k) then
-                partA(i,j,k+1,l+1) = Grids(igrd)%val0(j) * Hess(i,l*(l+1)/2+k+1)
+                 partA(i,j,k+1,l+1) = Grids(igrd)%val0(j) * Hess(i,l*(l+1)/2+k+1)
              else
-                partA(i,j,k+1,l+1) = Grids(igrd)%val0(j) * Hess(i,k*(k+1)/2+l+1)
+                 partA(i,j,k+1,l+1) = Grids(igrd)%val0(j) * Hess(i,k*(k+1)/2+l+1)
              endif
-             partB(i,j,k+1,l+1) = Grids(igrd)%val1(i,k+1) *Grids(igrd)%val1(j,l+1) 
+              partB(i,j,k+1,l+1) = Grids(igrd)%val1(i,k+1) *Grids(igrd)%val1(j,l+1) 
          enddo
       enddo
    enddo

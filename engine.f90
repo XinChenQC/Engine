@@ -7,28 +7,33 @@ implicit none
 !
 !====================
 ! input data zone
-integer       :: ncenters,imult,icharge,atomchg(2) ! natoms, multiplicity, charge
+integer       :: ncenters,imult,icharge,atomchg(3) ! natoms, multiplicity, charge
 character     :: baselable*30,functional_in*30  ! basis lable, functional
-real(8)       :: coord(2,3) ! coordinate, atomcharge
+real(8)       :: coord(3,3) ! coordinate, atomcharge
 ! output data zone
 integer       :: iconv                   ! converge
 real(8)       :: energy_out,econv        ! total energy, converge level
-real(8)       :: force_out(2,3),MLcharge_out(2) 
+real(8)       :: force_out(3,3),MLcharge_out(3) 
                     ! force,                Mullikencharge
-ncenters = 2
-imult = 1
-icharge = 0 
+ncenters = 3
+imult = 2
+icharge = -1
 baselable = '6-31g'
-coord(1,1)=  0.00
-coord(1,2)=  0.00
-coord(1,3)=  0.00
+coord(1,1)= -2.13
+coord(1,2)= -0.248
+coord(1,3)=  0.000
 
-coord(2,1)=   1.10
-coord(2,2)=   0.00
+coord(2,1)=  -1.17
+coord(2,2)=  -0.248
 coord(2,3)=   0.00
 
-atomchg(1) = 1
+coord(3,1)=  -2.45
+coord(3,2)=   0.657
+coord(3,3)=   0.00
+
+atomchg(1) = 8
 atomchg(2) = 1
+atomchg(3) = 1
 functional_in ='PBE_PBE'
 
 call EngineUp(ncenters,imult,icharge,functional_in,&

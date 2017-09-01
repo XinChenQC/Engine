@@ -248,15 +248,15 @@ do i = 1,nGauss
    endif
 
    Tempc = coor(2)**b *DEXP(-expo(i)*rs) * coeff(i) * Nor2
-   val(4) = Tempa*Tempb*Tempc+val(3)
+   val(4) = Tempa*Tempb*Tempc+val(4)
 !, dyy
    if (b .lt. 2) then
    val(3) = (-2*expo(i)*(2*b+1)*coor(2)**b + 4*expo(i)**2 * coor(2)**(b+2)) *&
-            coor(1)**a * coor(3)**c *DEXP(-expo(i)*rs) * coeff(i) * Nor2+ val(4)
+            coor(1)**a * coor(3)**c *DEXP(-expo(i)*rs) * coeff(i) * Nor2+ val(3)
    else
    val(3) = ( b*(b-1)*coor(2)**(b-2) &
              -2*expo(i)*(2*b+1)*coor(2)**b + 4*expo(i)**2 * coor(2)**(b+2) )*&
-             coor(1)**a * coor(3)**c *DEXP(-expo(i)*rs) * coeff(i) * Nor2+ val(4)
+             coor(1)**a * coor(3)**c *DEXP(-expo(i)*rs) * coeff(i) * Nor2+ val(3)
    endif
 !, dyz
    if (b .eq. 0) then
@@ -276,7 +276,7 @@ do i = 1,nGauss
 
 !, dzz
    if (c .lt. 2) then
-   val(6) = (-2*expo(i)*(2*c+1)*coor(2)**c + 4*expo(i)**2 * coor(2)**(c+2)) *&
+   val(6) = (-2*expo(i)*(2*c+1)*coor(3)**c + 4*expo(i)**2 * coor(3)**(c+2)) *&
             coor(1)**a * coor(2)**b *DEXP(-expo(i)*rs) * coeff(i) * Nor2+ val(6)
    else
    val(6) = ( c*(c-1)*coor(3)**(c-2) &

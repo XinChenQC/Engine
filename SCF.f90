@@ -57,8 +57,8 @@ INCLUDE 'parameter.h'
         enddo
            
         endif
-    Pa_n = Pa_n*0.5 + Pa*0.5
-    Pb_n = Pb_n*0.5 + Pb*0.5
+    Pa_n = Pa_n*0.3 + Pa*0.7
+    Pb_n = Pb_n*0.3 + Pb*0.7
     Fa = 0
     Fb = 0
 !#3. Calculate F accoreding to new P, E
