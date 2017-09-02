@@ -110,7 +110,7 @@ INCLUDE 'parameter.h'
                           nconts,Fxc_at,Fxc_bt,Et) 
         Fxc_a = Fxc_a + Fxc_at*TempGrid%weight 
         Fxc_b = Fxc_b + Fxc_bt*TempGrid%weight
-        Exc = Exc + Et*TempGrid%weight 
+        Exc = Exc + Et*grids(igrid)%weight 
     enddo
     deallocate(Fxc_at,Fxc_bt)
 end subroutine
@@ -161,7 +161,7 @@ real(8)    :: vrhoax,vrhobx,vsigmaaax,vsigmabbx,vsigmaabx, &
 
 real(8) :: Temp_A,Temp_B(3),Temp_C(3),Temp_Ba(3),Temp_Bb(3)
 type(Grid) :: tmpGrid
-real(8)  :: Tempval0
+
 
 !1. Call XC_fucntional 
 !   get E_ex and E_corr
@@ -222,18 +222,22 @@ Fxcb = 0
 
 if (IMULT .eq. 1) then   
    grids(igrd)%TempD(1) = d1rho 
+!    grids(igrd)%TempD(1) = 0
    grids(igrd)%TempD(2) = 2*d1sig*(drv_a(1)+drv_b(1))
    grids(igrd)%TempD(3) = 2*d1sig*(drv_a(2)+drv_b(2))
    grids(igrd)%TempD(4) = 2*d1sig*(drv_a(3)+drv_b(3))
+ !  grids(igrd)%TempD(2) = 2*d1sig*drv_a(1)
+ !  grids(igrd)%TempD(3) = 2*d1sig*drv_a(2)
+ !  grids(igrd)%TempD(4) = 2*d1sig*drv_a(3)
 else
-!  grids(igrd)%TempD(1) = vrhoa 
-!  grids(igrd)%TempD(2) = 2*vsigmaaa*drv_a(1) + vsigmaab*drv_b(1)
-!  grids(igrd)%TempD(3) = 2*vsigmaaa*drv_a(2) + vsigmaab*drv_b(2)
-!  grids(igrd)%TempD(4) = 2*vsigmaaa*drv_a(3) + vsigmaab*drv_b(3)
-!  grids(igrd)%TempD(5) = vrhob
-!  grids(igrd)%TempD(6) = 2*vsigmabb*drv_b(1) + vsigmaab*drv_a(1)
-!  grids(igrd)%TempD(7) = 2*vsigmabb*drv_b(2) + vsigmaab*drv_a(2)
-!  grids(igrd)%TempD(8) = 2*vsigmabb*drv_b(3) + vsigmaab*drv_a(3)
+   grids(igrd)%TempD(1) = vrhoa 
+   grids(igrd)%TempD(2) = 2*vsigmaaa*drv_a(1) + vsigmaab*drv_b(1)
+   grids(igrd)%TempD(3) = 2*vsigmaaa*drv_a(2) + vsigmaab*drv_b(2)
+   grids(igrd)%TempD(4) = 2*vsigmaaa*drv_a(3) + vsigmaab*drv_b(3)
+   grids(igrd)%TempD(5) = vrhob
+   grids(igrd)%TempD(6) = 2*vsigmabb*drv_b(1) + vsigmaab*drv_a(1)
+   grids(igrd)%TempD(7) = 2*vsigmabb*drv_b(2) + vsigmaab*drv_a(2)
+   grids(igrd)%TempD(8) = 2*vsigmabb*drv_b(3) + vsigmaab*drv_a(3)
 endif
 
 tmpGrid = grids(igrd)
@@ -246,21 +250,26 @@ endif
 
 do i = 1,n
    do j = i,n
-      Temp_C = (tmpGrid%val0(j)*tmpGrid%val1(i,:)+&
-                tmpGrid%val1(j,:)*tmpGrid%val0(i))
-      Tempval0 = tmpGrid%val0(i)*tmpGrid%val0(j)
+      Temp_C(1) = (tmpGrid%val0(j)*tmpGrid%val1(i,1)+&
+                   tmpGrid%val1(j,1)*tmpGrid%val0(i))
+ 
+      Temp_C(2) = (tmpGrid%val0(j)*tmpGrid%val1(i,2)+&
+                   tmpGrid%val1(j,2)*tmpGrid%val0(i))
+
+      Temp_C(3) = (tmpGrid%val0(j)*tmpGrid%val1(i,3)+&
+                   tmpGrid%val1(j,3)*tmpGrid%val0(i))
 
       if (imult .eq.1) then
-           Temp_A = d1rho*Tempval0
+           Temp_A = d1rho*tmpGrid%val0(i)*tmpGrid%val0(j)
            Temp_B = 2*d1sig*(drv_a+drv_b)
            Fxca(i,j) = Temp_A + (Temp_B(1)*Temp_C(1) + Temp_B(2)*Temp_C(2) + Temp_B(3)*Temp_C(3)) 
            Fxcb(i,j) = Fxca(i,j)
 
       else
-           Temp_A = vrhoa*Tempval0
+           Temp_A = vrhoa*tmpGrid%val0(i)*tmpGrid%val0(j)
            Fxca(i,j) = Temp_A + (Temp_Ba(1)*Temp_C(1) + Temp_Ba(2)*Temp_C(2) + Temp_Ba(3)*Temp_C(3)) 
           
-           Temp_A = vrhob*Tempval0
+           Temp_A = vrhob*tmpGrid%val0(i)*tmpGrid%val0(j)
            Fxcb(i,j) = Temp_A + (Temp_Bb(1)*Temp_C(1) + Temp_Bb(2)*Temp_C(2) + Temp_Bb(3)*Temp_C(3)) 
       endif
       Fxca(j,i) = Fxca(i,j)

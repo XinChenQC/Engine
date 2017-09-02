@@ -17,7 +17,8 @@ INCLUDE 'parameter.h'
     real(8),allocatable    :: Fxc_a(:,:),Fxc_b(:,:)
     real(8),allocatable    :: Fra(:,:),Frb(:,:)
     integer,external :: INDEX_2E
-
+    
+    real    :: timer1,timer2,timer3,timer4,timer5,timer6
     iter = 1
     iconv = 0
 
@@ -26,8 +27,9 @@ INCLUDE 'parameter.h'
 !#1. Solve FC=ESC Get C and e
 !        print *,"Fock 1"
 !        print *,Fa
+        call cpu_time(timer1)
         call solHFR_KS(info_sol)
-
+        call cpu_time(timer2)
 
 !#2. Calculate P according to C and E
         allocate(Pa_n(nconts,nconts))
@@ -68,8 +70,9 @@ INCLUDE 'parameter.h'
         allocate(Frb(nconts,nconts))
     Fra = 0
     Frb = 0
+      call cpu_time(timer3)
         call  DFT_calc(Exc,Fxc_a,Fxc_b,info)
-
+      call cpu_time(timer4)
         do i = 1,nconts
            do j=1,nconts
               Fra(i,j) =  Hcore(i,j)
@@ -96,6 +99,7 @@ INCLUDE 'parameter.h'
         enddo
         Fa = Fra + Fxc_a
         Fb = Frb + Fxc_b
+      call cpu_time(timer5)
         deallocate(Fxc_a)
         deallocate(Fxc_b)
 !  Calculate Total Energy 
@@ -137,6 +141,10 @@ INCLUDE 'parameter.h'
         deallocate(Pa_n)
         deallocate(Pb_n)
         iter = iter +1
+        call cpu_time(timer6)
+        print '("Diag. time:",f6.3," seconds")',timer2-timer1
+        print '("DFT   time:",f6.3," seconds")',timer4-timer3
+        print '("Total time:",f6.3," seconds")',timer6-timer1
     enddo
 
 !    info = 1 

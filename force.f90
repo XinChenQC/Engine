@@ -52,10 +52,6 @@ do i = 0,nBases-1
       deallocate (buf1eV)
    enddo
 enddo
-
-print *,"Hcore"
-print *,dHcore(:,:,3)
-
 ! 2. D(ij|kl)
 allocate( dJi (nConts,nConts,3) ) 
 allocate( dKi (nConts,nConts,3))
@@ -82,8 +78,6 @@ enddo
 enddo
 enddo
 
-print *,"dJi"
- print *,dJi(:,:,3)
 
 ! 3.  W
 
@@ -225,7 +219,7 @@ integer :: shls(2)
 integer :: bas(8,nBases)
 real(8) :: S(nConts,nConts,3)
 real(8) :: Norfac(nConts)
-real(8) :: buf1e(di,di,3)
+real(8) :: buf1e(di,dj,3)
 integer,external :: CINTcgto_cart
 
 real(8) :: intVal

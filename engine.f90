@@ -31,7 +31,7 @@ coord(3,1)=  -2.45
 coord(3,2)=   0.657
 coord(3,3)=   0.00
 
-atomchg(1) = 8
+atomchg(1) = 16
 atomchg(2) = 1
 atomchg(3) = 1
 functional_in ='PBE_PBE'
