@@ -1,9 +1,21 @@
-   Engine alpha-1.0
+   Engine alpha-1.1
 
 +++++   
    Engine: a independet quantum chemistry (QM) engine which provide QM 
            calculation results for other software. 
+           It should be FAST
 +++++   
    Developer: Xin Chen
    Email:     chenxin199261@gmail.com
 +++++
+Time-Line:
+Create: JUL,2017 alpha-1.0
+ReCreate: Mar,2021 alpha-1.1
++++++
+Developing, Don't use it !
++++++
+TodoList:
+1. Density Fitting Calculation.
+2. DirectSCF.
+3. Fast Multipole 2e integrals.
+4. Fast DFT grids calculation

@@ -41,7 +41,7 @@ force.o:force.f90
 Engine : $(objects)
 #	$(FORT90) -fno-backtrace -o  Engine  $(objects) libcint.a   -Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_gf_lp64.a ${MKLROOT}/lib/intel64/libmkl_sequential.a ${MKLROOT}/lib/intel64/libmkl_core.a -Wl,--end-group -lpthread -lm -ldl
 
-	$(FORT90) -o  Engine -debug -fbacktrace $(objects) libcint.a -lblas -llapack 
+	$(FORT90) -o  Engine -debug -fbacktrace $(objects) libcint.a -L/home/xchen/Library/lapack -llapack -lblas 
 .PHONY : clean
 clean :
 	rm  Engine  $(objects) *.mod 
